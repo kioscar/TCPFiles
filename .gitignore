@@ -4,5 +4,4 @@
 
 /.vs
 /ServerTCPFiles/.vs/ServerTCPFiles/v15/Server/sqlite3
-/ServerTCPFiles/ServerFiles/obj/Debug/netstandard2.0
-/ServerTCPFiles/ServerFiles/bin/Debug/netstandard2.0
+*.cache
