@@ -5,3 +5,5 @@
 /.vs
 /ServerTCPFiles/.vs/ServerTCPFiles/v15/Server/sqlite3
 *.cache
+/ServerTCPFiles/ServerFiles/bin
+/ServerTCPFiles/ServerFiles/obj
