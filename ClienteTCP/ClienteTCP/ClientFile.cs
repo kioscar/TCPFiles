@@ -14,7 +14,7 @@ using System.Net;
 using System.Net.Sockets;
 namespace ClienteTCP
 {
-    class ClientFile
+   public class ClientFile
     {
         #region Propiedades
         int Port { set; get; }
@@ -55,17 +55,25 @@ namespace ClienteTCP
             }
         }
 
-        public void Enviar()
+        public string Enviar()
         {
+            int bytesRead = 0;
+            try
+            {
+                NetworkStream serverStream = clientSocket.GetStream();
+                byte[] outStream = Encoding.ASCII.GetBytes("Message from Client$");
+                serverStream.Write(outStream, 0, outStream.Length);
+                serverStream.Flush();
 
-            NetworkStream serverStream = clientSocket.GetStream();
-            byte[] outStream = Encoding.ASCII.GetBytes("Message from Client$");
-            serverStream.Write(outStream, 0, outStream.Length);
-            serverStream.Flush();
-
-            byte[] inStream = new byte[10025];
-            serverStream.Read(inStream, 0, (int)clientSocket.ReceiveBufferSize);
-            string returndata = Encoding.ASCII.GetString(inStream);
+                byte[] inStream = new byte[4096];
+                bytesRead = serverStream.Read(inStream, 0, inStream.Length/*(int)clientSocket.ReceiveBufferSize*/);
+                string returndata = Encoding.ASCII.GetString(inStream, 0, bytesRead);
+                return returndata;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                throw new Exception("Algo anda mal con el tamaño del arreglo: " + bytesRead);
+            }            
         }
 
         #endregion

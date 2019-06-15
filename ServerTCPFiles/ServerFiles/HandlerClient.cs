@@ -21,7 +21,7 @@ namespace ServerFiles
 
         public void StartClient(TcpClient inClientSocket)
         {
-            clientSocket = inClientSocket;;
+            clientSocket = inClientSocket;
             
             try
             {
@@ -41,17 +41,17 @@ namespace ServerFiles
 
         private void DoAction()
         {
-            byte[] bytesFrom = new byte[10025];
+            byte[] bytesFrom = new byte[4096];
             string dataFromClient = null;
             Byte[] sendBytes = null;
             string serverResponse = null;
 
-            while ((true))
-            {
+           // while ((true))
+            //{
                 try
                 {
                     NetworkStream networkStream = clientSocket.GetStream();
-                    networkStream.Read(bytesFrom, 0, (int)clientSocket.ReceiveBufferSize);
+                    networkStream.Read(bytesFrom, 0, bytesFrom.Length);
                     dataFromClient = Encoding.ASCII.GetString(bytesFrom);
                     dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
 
@@ -71,7 +71,7 @@ namespace ServerFiles
                 {
                     Console.WriteLine(" >> " + ex.ToString());
                 } // try - finally
-            } // while
+            //} // while
         } // DoAction
         #endregion
     }
