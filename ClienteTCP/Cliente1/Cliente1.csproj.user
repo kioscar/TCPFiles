@@ -4,5 +4,6 @@
     <SelectedDevice>LGE LG-M250</SelectedDevice>
     <AndroidDesignerPreferredTheme>Theme.DeviceDefault</AndroidDesignerPreferredTheme>
     <AndroidDesignerPreferredDevice>Nexus 4</AndroidDesignerPreferredDevice>
+    <DefaultDevice>Android_Accelerated_x86_Nougat</DefaultDevice>
   </PropertyGroup>
 </Project>

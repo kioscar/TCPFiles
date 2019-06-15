@@ -13,7 +13,7 @@ namespace Cliente1
         {
             base.OnCreate(savedInstanceState);
             // Set our view from the "main" layout resource
-            SetContentView(Resource.Layout.activity_main);
+            SetContentView(Resource.Layout.Main);
 
             //var btnEnviar = FindViewById<Button>(Resource.Id.btntEnviar);
             //btnEnviar.Click += BtnEnviar_Click;
