@@ -55,12 +55,7 @@ namespace ServerFiles
         #region Destructor
         ~ServerFile()
         {
-            if (clientSocket.Connected)
-            {
-                clientSocket.Close();
-                serverSocket.Stop();
-            }
-
+            serverSocket.Stop();         
         }
         #endregion
         #region Métodos
@@ -75,17 +70,11 @@ namespace ServerFiles
 
                 while (true)
                 {
-                    if (Terminar)
-                        break;
-
                     // Aceptamos la conexión del cliente y la manejamos en otro Thread.
-                    clientSocket = serverSocket.AcceptTcpClient();
+                    clientSocket =  serverSocket.AcceptTcpClient();// AcceptTcpClient();
                     HandlerClient hndlCliente = new HandlerClient();
                     hndlCliente.StartClient(clientSocket);
                 }
-                clientSocket.Close();
-                serverSocket.Stop();
-                Console.WriteLine("Exiting...");
 
             }
             catch (SocketException Arg)

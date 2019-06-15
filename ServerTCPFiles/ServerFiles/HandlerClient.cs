@@ -70,7 +70,11 @@ namespace ServerFiles
                 catch (Exception ex)
                 {
                     Console.WriteLine(" >> " + ex.ToString());
-                } // try - finally
+                }
+                finally
+                {
+                    clientSocket.Close();
+                }// try - finally
             //} // while
         } // DoAction
         #endregion
