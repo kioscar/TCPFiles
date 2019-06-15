@@ -66,7 +66,7 @@ namespace ClienteTCP
                 serverStream.Flush();
 
                 byte[] inStream = new byte[4096];
-                bytesRead = serverStream.Read(inStream, 0, inStream.Length/*(int)clientSocket.ReceiveBufferSize*/);
+                bytesRead = serverStream.Read(inStream, 0, inStream.Length);
                 string returndata = Encoding.ASCII.GetString(inStream, 0, bytesRead);
                 return returndata;
             }

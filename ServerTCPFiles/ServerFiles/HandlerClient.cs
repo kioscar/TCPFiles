@@ -48,33 +48,34 @@ namespace ServerFiles
 
            // while ((true))
             //{
-                try
-                {
-                    NetworkStream networkStream = clientSocket.GetStream();
-                    networkStream.Read(bytesFrom, 0, bytesFrom.Length);
-                    dataFromClient = Encoding.ASCII.GetString(bytesFrom);
-                    dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
+            try
+            {
+                NetworkStream networkStream = clientSocket.GetStream();
+                networkStream.Read(bytesFrom, 0, bytesFrom.Length);
+                dataFromClient = Encoding.ASCII.GetString(bytesFrom);
+                dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
 
-                    Console.WriteLine(" >> " + dataFromClient);
+                Console.WriteLine(" >> " + dataFromClient);
 
-                    serverResponse = "Server to clinet('Hi this is my response')";
-                    sendBytes = Encoding.ASCII.GetBytes(serverResponse);
-                    networkStream.Write(sendBytes, 0, sendBytes.Length);
-                    networkStream.Flush();
-                    Console.WriteLine(" >> " + serverResponse);
-                }
-                catch(ObjectDisposedException)
-                {
-                    Console.WriteLine("El NetworkStream del client esta vacío.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(" >> " + ex.ToString());
-                }
-                finally
-                {
-                    clientSocket.Close();
-                }// try - finally
+                serverResponse = "Server to clinet('Hi this is my response')";
+
+                sendBytes = Encoding.ASCII.GetBytes(serverResponse);
+                networkStream.Write(sendBytes, 0, sendBytes.Length);
+                networkStream.Flush();
+                Console.WriteLine(" >> " + serverResponse);
+            }
+            catch(ObjectDisposedException)
+            {
+                Console.WriteLine("El NetworkStream del client esta vacío.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(" >> " + ex.ToString());
+            }
+            finally
+            {
+                clientSocket.Close();
+            }// try - finally
             //} // while
         } // DoAction
         #endregion

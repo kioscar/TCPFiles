@@ -20,8 +20,6 @@ namespace ServerFiles
         #region Propiedades
         public int Port { set; get; }
         public string Server { set; get; }
-        public bool Terminar { set; get; }
-
         #endregion
 
         #region Constructores
@@ -58,6 +56,8 @@ namespace ServerFiles
             serverSocket.Stop();         
         }
         #endregion
+
+
         #region Métodos
         public void Start()
         {
@@ -71,7 +71,7 @@ namespace ServerFiles
                 while (true)
                 {
                     // Aceptamos la conexión del cliente y la manejamos en otro Thread.
-                    clientSocket =  serverSocket.AcceptTcpClient();// AcceptTcpClient();
+                    clientSocket =  serverSocket.AcceptTcpClient();
                     HandlerClient hndlCliente = new HandlerClient();
                     hndlCliente.StartClient(clientSocket);
                 }
