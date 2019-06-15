@@ -7,3 +7,5 @@
 *.cache
 /ServerTCPFiles/ServerFiles/bin
 /ServerTCPFiles/ServerFiles/obj
+/ClienteTCP/.vs/ClienteTCP/v15
+/ClienteTCP/ClienteTCP/obj
