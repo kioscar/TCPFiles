@@ -24,7 +24,6 @@ namespace ClienteTCP
         #region Variables
 
         TcpClient clientSocket = new TcpClient();
-        NetworkStream serverStream;
         #endregion
 
         #region Métodos

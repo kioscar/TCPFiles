@@ -10,7 +10,7 @@ using System.Net.Sockets;
 using System.Threading;
 namespace ServerFiles
 {
-    class ServerFile
+    public class ServerFile
     {
         #region Variables
         TcpListener serverSocket;
@@ -20,6 +20,8 @@ namespace ServerFiles
         #region Propiedades
         public int Port { set; get; }
         public string Server { set; get; }
+        public bool Terminar { set; get; }
+
         #endregion
 
         #region Constructores
@@ -36,8 +38,31 @@ namespace ServerFiles
         {
             this.Port = aPort;
         }
+
+        /// <summary>
+        /// Constructor con server y puerto.
+        /// </summary>
+        /// <param name="aServer">IP del servidor</param>
+        /// <param name="aPort">Puerto </param>
+        public ServerFile(string aServer, int aPort)
+        {
+            Port = aPort;
+            Server = aServer;
+        }
+
         #endregion
 
+        #region Destructor
+        ~ServerFile()
+        {
+            if (clientSocket.Connected)
+            {
+                clientSocket.Close();
+                serverSocket.Stop();
+            }
+
+        }
+        #endregion
         #region Métodos
         public void Start()
         {
@@ -48,12 +73,16 @@ namespace ServerFiles
 
                 serverSocket.Start();
 
-                // Aceptamos la conexión del cliente y la manejamos en otro Thread.
-                clientSocket = serverSocket.AcceptTcpClient();
+                while (true)
+                {
+                    if (Terminar)
+                        break;
 
-                HandlerClient hndlCliente = new HandlerClient();
-                hndlCliente.StartClient(clientSocket);
-
+                    // Aceptamos la conexión del cliente y la manejamos en otro Thread.
+                    clientSocket = serverSocket.AcceptTcpClient();
+                    HandlerClient hndlCliente = new HandlerClient();
+                    hndlCliente.StartClient(clientSocket);
+                }
                 clientSocket.Close();
                 serverSocket.Stop();
                 Console.WriteLine("Exiting...");

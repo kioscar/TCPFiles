@@ -21,7 +21,7 @@ namespace ServerFiles
 
         public void StartClient(TcpClient inClientSocket)
         {
-            this.clientSocket = inClientSocket;;
+            clientSocket = inClientSocket;;
             
             try
             {
@@ -55,7 +55,8 @@ namespace ServerFiles
                     dataFromClient = Encoding.ASCII.GetString(bytesFrom);
                     dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
 
-                    
+                    Console.WriteLine(" >> " + dataFromClient);
+
                     serverResponse = "Server to clinet('Hi this is my response')";
                     sendBytes = Encoding.ASCII.GetBytes(serverResponse);
                     networkStream.Write(sendBytes, 0, sendBytes.Length);
