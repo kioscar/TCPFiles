@@ -5,6 +5,7 @@ using Android.Runtime;
 using Android.Widget;
 using ClienteTCP;
 using System;
+using System.IO;
 
 namespace Cliente1
 {
@@ -19,6 +20,16 @@ namespace Cliente1
 
             var btnEnviar = FindViewById<Button>(Resource.Id.btntEnviar);
             btnEnviar.Click += BtnEnviar_Click;
+
+            // Limpiar textbox
+            var btnLimpiar = FindViewById<Button>(Resource.Id.btnLimpiar);
+            btnLimpiar.Click += BtnLimpiar_Click;
+        }
+
+        private void BtnLimpiar_Click(object sender, EventArgs e)
+        {
+            var edtMensaje = FindViewById<EditText>(Resource.Id.edtMensaje);
+            edtMensaje.Text = "";
         }
 
         private void BtnEnviar_Click(object sender, System.EventArgs e)
@@ -31,10 +42,13 @@ namespace Cliente1
             
             try
             {
-                ClientFile clienteTcp = new ClientFile(aPort: int.Parse(txtPort.Text), aServer: "192.168.0.29");
+                var rutaArchivo = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "XMLS");
+                rutaArchivo = Path.Combine(rutaArchivo, "archivo.xml");
+
+                ClientFile clienteTcp = new ClientFile(aPort: int.Parse(txtPort.Text), aServer: "192.168.0.29", aFileName: rutaArchivo);
                 clienteTcp.Conectar();
                 var edtMensaje = FindViewById<EditText>(Resource.Id.edtMensaje);
-                edtMensaje.Text += clienteTcp.Enviar() + "\n";
+                edtMensaje.Text += clienteTcp.EnviarMensajeRecibirArchivo() + "\n";
             }
             catch(Exception ex)
             {

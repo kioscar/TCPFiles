@@ -6,23 +6,26 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.IO;
 
 namespace ServerFiles
 {
     class HandlerClient
     {
 
+
         #region Variables
         TcpClient clientSocket;
+        string fileName;
 
         #endregion
 
         #region Métodos
 
-        public void StartClient(TcpClient inClientSocket)
+        public void StartClient(TcpClient inClientSocket, string aNombreArchivo)
         {
             clientSocket = inClientSocket;
-            
+            fileName = aNombreArchivo;
             try
             {
                 Thread ctThread = new Thread(DoAction);
@@ -43,11 +46,8 @@ namespace ServerFiles
         {
             byte[] bytesFrom = new byte[4096];
             string dataFromClient = null;
-            Byte[] sendBytes = null;
+            byte[] sendBytes = null;
             string serverResponse = null;
-
-           // while ((true))
-            //{
             try
             {
                 NetworkStream networkStream = clientSocket.GetStream();
@@ -57,9 +57,17 @@ namespace ServerFiles
 
                 Console.WriteLine(" >> " + dataFromClient);
 
-                serverResponse = "Server to clinet('Hi this is my response')";
+                //serverResponse = "Server to clinet('Hi this is my response')";
 
-                sendBytes = Encoding.ASCII.GetBytes(serverResponse);
+                // Cargamos el archivo para enviarlo 
+                StreamReader streamReader = new StreamReader(fileName);
+                var memoryStream = new MemoryStream();
+                streamReader.BaseStream.CopyTo(memoryStream);
+                sendBytes = memoryStream.ToArray();
+                memoryStream.Close();
+                streamReader.Close();
+
+                //sendBytes =  Encoding.ASCII.GetBytes(serverResponse);
                 networkStream.Write(sendBytes, 0, sendBytes.Length);
                 networkStream.Flush();
                 Console.WriteLine(" >> " + serverResponse);
@@ -76,7 +84,6 @@ namespace ServerFiles
             {
                 clientSocket.Close();
             }// try - finally
-            //} // while
         } // DoAction
         #endregion
     }

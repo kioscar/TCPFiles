@@ -14,6 +14,8 @@ namespace Ejemplo1
     public partial class MainFrm : Form
     {
         ServerFile server;
+        const string rutaArchivo = @"C:\Archivos\archivo.xml";
+
         public MainFrm()
         {
             InitializeComponent();
@@ -24,7 +26,7 @@ namespace Ejemplo1
 
             try
             {
-                server = new ServerFile(txtServer.Text, Convert.ToInt32(txtPort.Text));
+                server = new ServerFile(txtServer.Text, Convert.ToInt32(txtPort.Text), rutaArchivo);
                 server.Start();
                 /*Thread ServidorThread = new Thread(DoSomething);
                 ServidorThread.Start();*/

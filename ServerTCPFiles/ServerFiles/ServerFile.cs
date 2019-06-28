@@ -20,6 +20,7 @@ namespace ServerFiles
         #region Propiedades
         public int Port { set; get; }
         public string Server { set; get; }
+        public string RutaArchivo { set; get; }
         #endregion
 
         #region Constructores
@@ -48,6 +49,13 @@ namespace ServerFiles
             Server = aServer;
         }
 
+        public ServerFile(string aServer, int aPort, string aRutaArchivo)
+        {
+            Port = aPort;
+            Server = aServer;
+            RutaArchivo = aRutaArchivo;
+        }
+
         #endregion
 
         #region Destructor
@@ -63,19 +71,11 @@ namespace ServerFiles
         {
             try
             {
-                serverSocket = new TcpListener(IPAddress.Parse(Server), Port);
-                clientSocket = default(TcpClient);
+                serverSocket = new TcpListener(IPAddress.Parse(Server), Port);             
 
                 serverSocket.Start();
-
-                while (true)
-                {
-                    // Aceptamos la conexión del cliente y la manejamos en otro Thread.
-                    clientSocket =  serverSocket.AcceptTcpClient();
-                    HandlerClient hndlCliente = new HandlerClient();
-                    hndlCliente.StartClient(clientSocket);
-                }
-
+               
+                serverSocket.BeginAcceptTcpClient(new AsyncCallback(AcceptTcp), serverSocket);
             }
             catch (SocketException Arg)
             {
@@ -85,6 +85,23 @@ namespace ServerFiles
             {
                 Console.WriteLine(Arg.Message);
             } // try - finally
+        }
+
+        private void AcceptTcp(IAsyncResult ar)
+        {
+            try
+            {
+                clientSocket = default(TcpClient);
+                clientSocket = serverSocket.EndAcceptTcpClient(ar);
+                HandlerClient hndlCliente = new HandlerClient();
+                hndlCliente.StartClient(clientSocket, RutaArchivo);
+
+                // Lo dejamos escuchando para nuevas conexiones.
+                serverSocket.BeginAcceptTcpClient(new AsyncCallback(AcceptTcp), serverSocket);
+            }catch(Exception ex)
+            {
+                Console.WriteLine(">> Error: " + ex.Message);
+            }
         }
         #endregion
     }

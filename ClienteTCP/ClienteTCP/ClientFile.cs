@@ -12,13 +12,20 @@ using Android.Widget;
 
 using System.Net;
 using System.Net.Sockets;
+using System.IO;
+using Java.IO;
+
 namespace ClienteTCP
 {
    public class ClientFile
     {
         #region Propiedades
-        int Port { set; get; }
-        string Server { set; get; }
+        public int Port { set; get; }
+        public string Server { set; get; }
+        /// <summary>
+        /// Inlcuye el path del archivo.
+        /// </summary>
+        public string FileName { set; get; }
         #endregion
 
         #region Variables
@@ -27,6 +34,7 @@ namespace ClienteTCP
         #endregion
 
         #region Métodos
+
         public ClientFile(int aPort) {
             Port = aPort;
         }
@@ -34,6 +42,14 @@ namespace ClienteTCP
             Port = aPort;
             Server = aServer;
         }
+
+        public ClientFile(int aPort, string aServer, string aFileName)
+        {
+            Port = aPort;
+            Server = aServer;
+            FileName = aFileName;
+        }
+
         public ClientFile() { }
 
 
@@ -45,35 +61,64 @@ namespace ClienteTCP
             }
             catch (SocketException)
             {
-                Console.WriteLine("Ocurrió un problema con el socket");
+                System.Console.WriteLine("Ocurrió un problema con el socket");
                 throw new Exception("Problema en el socket.");
             }
             catch (ObjectDisposedException)
             {
-                Console.WriteLine("El socket cliente se encuentra null");
+                System.Console.WriteLine("El socket cliente se encuentra null");
                 throw new Exception("El socket cliente no esta creado.");
             }
         }
 
-        public string Enviar()
+        public string EnviarMensajeRecibirArchivo()
         {
             int bytesRead = 0;
             try
             {
                 NetworkStream serverStream = clientSocket.GetStream();
-                byte[] outStream = Encoding.ASCII.GetBytes("Message from Client$");
+                byte[] outStream = Encoding.ASCII.GetBytes("Enviar archivo a dispositivo$");
                 serverStream.Write(outStream, 0, outStream.Length);
                 serverStream.Flush();
 
-                byte[] inStream = new byte[4096];
-                bytesRead = serverStream.Read(inStream, 0, inStream.Length);
-                string returndata = Encoding.ASCII.GetString(inStream, 0, bytesRead);
-                return returndata;
+                // Recibimos el archivo y lo guardamos.
+                MemoryStream memoryStream = new MemoryStream();
+                byte[] inStream = new byte[4096*8];
+                do
+                {
+                    bytesRead = serverStream.Read(inStream, 0, inStream.Length);                    
+                    memoryStream.Write(inStream, 0, bytesRead);
+                } while (bytesRead > 0);
+
+                
+                if (!Directory.Exists(Path.GetDirectoryName(FileName)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(FileName));
+
+                Java.IO.File file = new Java.IO.File(FileName);
+                if (file.Exists())
+                    file.Delete();
+
+                try
+                {
+                    FileOutputStream outs = new FileOutputStream(file);
+                    outs.Write(memoryStream.ToArray());
+                    outs.Flush();
+                    outs.Close();
+                    return "Archivo recibido.";
+                }
+                catch (Exception ex)
+                {
+                    return "No se pudo recibir el archivo:\n" + ex.Message;
+                }
             }
             catch (ArgumentOutOfRangeException)
             {
                 throw new Exception("Algo anda mal con el tamaño del arreglo: " + bytesRead);
-            }            
+            }     
+            catch(Exception ex)
+            {
+                throw new Exception("Error desconocido:\n" + ex.Message);
+            }
         }
 
         #endregion
