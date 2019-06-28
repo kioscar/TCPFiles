@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Envio de mensajes</string>
     <string name="action_settings">Settings</string>
-    <string name="ButtonEnv">Enviar</string>
+    <string name="ButtonRecibir">Recibir archivo</string>
+  <string name="ButtonEnviar">Enviar archivo</string>
   <string name="ButtonLimp">Limpiar</string>
 </resources>

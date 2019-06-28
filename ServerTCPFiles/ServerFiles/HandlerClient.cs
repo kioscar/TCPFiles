@@ -55,22 +55,63 @@ namespace ServerFiles
                 dataFromClient = Encoding.ASCII.GetString(bytesFrom);
                 dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
 
-                Console.WriteLine(" >> " + dataFromClient);
+                // Si encontramos en la cadena este sibolo ! es para recibir un archivo desde el cliente
+                if (dataFromClient.Contains("!"))
+                {
+                    var ArrNombreArchivo = dataFromClient.Split('!');
+                    string NombreArchivo = ArrNombreArchivo[0];
+                    fileName = Path.Combine(Path.GetDirectoryName(fileName), NombreArchivo + "count.xml");
 
-                //serverResponse = "Server to clinet('Hi this is my response')";
+                    var Response = Encoding.ASCII.GetBytes("Continuar");
+                    networkStream.Write(Response, 0, Response.Length);
+                    networkStream.Flush();
 
-                // Cargamos el archivo para enviarlo 
-                StreamReader streamReader = new StreamReader(fileName);
-                var memoryStream = new MemoryStream();
-                streamReader.BaseStream.CopyTo(memoryStream);
-                sendBytes = memoryStream.ToArray();
-                memoryStream.Close();
-                streamReader.Close();
+                    // Recibimos ahora el archivo y lo guardamos.
+                    int bytesRead = 0;
+                    try
+                    {
+                        MemoryStream memoryStream = new MemoryStream();
+                        byte[] inStream = new byte[4096*8];
+                        //do
+                        //{
+                        bytesRead = networkStream.Read(inStream, 0, inStream.Length);
+                        memoryStream.Write(inStream, 0, bytesRead);
+                        //} while (bytesRead > 0);
 
-                //sendBytes =  Encoding.ASCII.GetBytes(serverResponse);
-                networkStream.Write(sendBytes, 0, sendBytes.Length);
-                networkStream.Flush();
-                Console.WriteLine(" >> " + serverResponse);
+                        if (!Directory.Exists(Path.GetDirectoryName(fileName)))
+                            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+
+
+                        // Guardar el archivo 
+                        var ArchivoRecibido = File.Create(fileName);
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+                        memoryStream.CopyTo(ArchivoRecibido);
+                        ArchivoRecibido.Close();
+                        Console.WriteLine(" >> Recibido Correctamente");
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+                else
+                {
+
+                    Console.WriteLine(" >> " + dataFromClient);
+
+                    // Cargamos el archivo para enviarlo 
+                    StreamReader streamReader = new StreamReader(fileName);
+                    var memoryStream = new MemoryStream();
+                    streamReader.BaseStream.CopyTo(memoryStream);
+                    sendBytes = memoryStream.ToArray();
+                    memoryStream.Close();
+                    streamReader.Close();
+
+                    //sendBytes =  Encoding.ASCII.GetBytes(serverResponse);
+                    networkStream.Write(sendBytes, 0, sendBytes.Length);
+                    networkStream.Flush();
+                    Console.WriteLine(" >> " + serverResponse);
+                }
             }
             catch(ObjectDisposedException)
             {

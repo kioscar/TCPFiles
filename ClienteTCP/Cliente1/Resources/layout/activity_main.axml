@@ -56,12 +56,20 @@
 			android:id="@+id/edtMensaje">
 		</EditText>
 		<Button
-			android:text="@string/ButtonEnv"
+			android:text="@string/ButtonRecibir"
 			android:minWidth="25px"
 			android:minHeight="25px"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:id="@+id/btntEnviar">
+			android:id="@+id/btnRecibir">
+		</Button>
+		<Button
+			android:text="@string/ButtonEnviar"
+			android:minWidth="25px"
+			android:minHeight="25px"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/btnEnviar">
 		</Button>
 		
 		<Button

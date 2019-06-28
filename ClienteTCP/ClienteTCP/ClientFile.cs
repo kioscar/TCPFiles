@@ -14,6 +14,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using Java.IO;
+using Android.Telephony;
 
 namespace ClienteTCP
 {
@@ -116,6 +117,58 @@ namespace ClienteTCP
                 throw new Exception("Algo anda mal con el tamaño del arreglo: " + bytesRead);
             }     
             catch(Exception ex)
+            {
+                throw new Exception("Error desconocido:\n" + ex.Message);
+            }
+        } // EnviarMensajeRecibirArchivo()
+
+
+        public string EnviarMensajeEnviarArchivo()
+        {
+            // Se implementa el envio del archivo 
+            int bytesRead = 0;
+            try
+            {
+                string imeiTel = "AAAA";
+
+                NetworkStream serverStream = clientSocket.GetStream();
+                byte[] outStream = Encoding.ASCII.GetBytes(imeiTel + "!$");
+                serverStream.Write(outStream, 0, outStream.Length);
+                serverStream.Flush();
+
+                // Recibimos la respuesta y enviamos el archivo.
+
+                byte[] inStream = new byte[4096];
+                bytesRead = serverStream.Read(inStream, 0, inStream.Length);
+                string returndata = Encoding.ASCII.GetString(inStream, 0, bytesRead);
+
+                if (!(returndata == "Continuar"))
+                    return "No es posible enviar el archivo";
+
+                try
+                {
+                    StreamReader streamReader = new StreamReader(FileName);
+                    var memoryStream = new MemoryStream();
+                    streamReader.BaseStream.CopyTo(memoryStream);
+                    memoryStream.Close();
+                    streamReader.Close();
+
+                    outStream = memoryStream.ToArray();
+                    serverStream.Write(outStream, 0, outStream.Length);
+                    serverStream.Flush();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                } // try-catch 
+
+                return "Archivo enviado.";
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                throw new Exception("Algo anda mal con el tamaño del arreglo: " + bytesRead);
+            }
+            catch (Exception ex)
             {
                 throw new Exception("Error desconocido:\n" + ex.Message);
             }
