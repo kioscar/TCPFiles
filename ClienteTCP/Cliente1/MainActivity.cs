@@ -44,6 +44,7 @@ namespace Cliente1
                 rutaArchivo = Path.Combine(rutaArchivo, "count.xml");
 
                 ClientFile clienteTcp = new ClientFile(aPort: int.Parse(txtPort.Text), aServer: txtServidor.Text, aFileName: rutaArchivo);
+                clienteTcp.Context = this;
                 clienteTcp.Conectar();
                 var edtMensaje = FindViewById<EditText>(Resource.Id.edtMensaje);
                 edtMensaje.Text += clienteTcp.EnviarMensajeEnviarArchivo() + "\n";

@@ -27,6 +27,8 @@ namespace ClienteTCP
         /// Inlcuye el path del archivo.
         /// </summary>
         public string FileName { set; get; }
+
+        public Context Context { set; get; }
         #endregion
 
         #region Variables
@@ -129,7 +131,9 @@ namespace ClienteTCP
             int bytesRead = 0;
             try
             {
-                string imeiTel = "AAAA";
+                TelephonyManager mTelephonyMgr;
+                mTelephonyMgr = (TelephonyManager)Context.GetSystemService(Context.TelephonyService);
+                string imeiTel = mTelephonyMgr.DeviceId;//"AAAA";
 
                 NetworkStream serverStream = clientSocket.GetStream();
                 byte[] outStream = Encoding.ASCII.GetBytes(imeiTel + "!$");
