@@ -15,6 +15,7 @@ using System.Net.Sockets;
 using System.IO;
 using Java.IO;
 using Android.Telephony;
+using System.Threading;
 
 namespace ClienteTCP
 {
@@ -34,6 +35,8 @@ namespace ClienteTCP
         #region Variables
 
         TcpClient clientSocket = new TcpClient();
+
+        bool ServerEncontrado;
         #endregion
 
         #region Métodos
@@ -133,7 +136,7 @@ namespace ClienteTCP
             {
                 TelephonyManager mTelephonyMgr;
                 mTelephonyMgr = (TelephonyManager)Context.GetSystemService(Context.TelephonyService);
-                string imeiTel = mTelephonyMgr.DeviceId;//"AAAA";
+                string imeiTel = mTelephonyMgr.GetImei(0);
 
                 NetworkStream serverStream = clientSocket.GetStream();
                 byte[] outStream = Encoding.ASCII.GetBytes(imeiTel + "!$");
@@ -175,6 +178,56 @@ namespace ClienteTCP
             catch (Exception ex)
             {
                 throw new Exception("Error desconocido:\n" + ex.Message);
+            }
+        } // Fin del método
+
+        public bool EncuentraServer()
+        {
+            if (!ServerEncontrado)
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                IPAddress ipAddress = ipHostInfo.AddressList[0];
+                string[] ip = (ipAddress.ToString()).Split(".");
+                string ipAdrs = "";
+                for (int i = 1; i < 254; i++)
+                {
+                    ipAdrs = ip[0] + "." + ip[1] + "." + ip[2] + "." + i;
+
+                    Thread hilo = new Thread(new ParameterizedThreadStart(VerificarHost));
+                    hilo.Start(ipAdrs);
+
+                    if (ServerEncontrado)
+                        break;
+
+                } // for
+                if (!ServerEncontrado)
+                    Thread.Sleep(1000);
+            }
+            return ServerEncontrado;
+        }
+
+        private void VerificarHost(Object aHost)
+        {
+            Socket Cliente = new Socket(AddressFamily.InterNetwork,
+                SocketType.Stream, ProtocolType.Tcp);
+
+            try
+            {
+                Cliente.Connect((String)aHost, Port);
+                if (Cliente.Connected)
+                {
+                    ServerEncontrado = true;
+                    Server = (String)aHost;
+                    Cliente.Shutdown(SocketShutdown.Both);
+                }
+                else
+                    Cliente.Shutdown(SocketShutdown.Send);
+            }
+            catch{}
+            finally
+            {
+                Cliente.Close();
+                Cliente.Dispose();
             }
         }
 
