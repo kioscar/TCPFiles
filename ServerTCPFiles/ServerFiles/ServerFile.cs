@@ -77,13 +77,13 @@ namespace ServerFiles
                
                 serverSocket.BeginAcceptTcpClient(new AsyncCallback(AcceptTcp), serverSocket);
             }
-            catch (SocketException Arg)
+            catch (SocketException ex)
             {
-                Console.WriteLine(Arg.Message);
+                LevantaExcepcion(ex);
             }
-            catch (ArgumentNullException Arg)
+            catch (ArgumentNullException ex)
             {
-                Console.WriteLine(Arg.Message);
+                LevantaExcepcion(ex);
             } // try - finally
         }
 
@@ -100,8 +100,13 @@ namespace ServerFiles
                 serverSocket.BeginAcceptTcpClient(new AsyncCallback(AcceptTcp), serverSocket);
             }catch(Exception ex)
             {
-                Console.WriteLine(">> Error: " + ex.Message);
+                LevantaExcepcion(ex);
             }
+        }
+
+        private void LevantaExcepcion(Exception ex)
+        {
+            throw new Exception(ex.Message);
         }
         #endregion
     }

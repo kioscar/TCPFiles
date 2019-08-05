@@ -33,11 +33,11 @@ namespace ServerFiles
             }
             catch (ThreadStartException)
             {
-                throw new Exception("Error al iniciar servicio del thread.");
+                LevantaExcepcion( new Exception("Error al iniciar servicio del thread."));
             }
             catch (Exception)
             {
-                throw new Exception("Error al iniciar servicio en general.");
+                LevantaExcepcion( new Exception("Error al iniciar servicio en general."));
             }
 
         }
@@ -45,22 +45,19 @@ namespace ServerFiles
         private void DoAction()
         {
             byte[] bytesFrom = new byte[4096];
-            string dataFromClient = null;
-            byte[] sendBytes = null;
-            string serverResponse = null;
             try
             {
                 NetworkStream networkStream = clientSocket.GetStream();
                 networkStream.Read(bytesFrom, 0, bytesFrom.Length);
-                dataFromClient = Encoding.ASCII.GetString(bytesFrom);
+                string dataFromClient = Encoding.ASCII.GetString(bytesFrom);
                 dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
 
                 // Si encontramos en la cadena este sibolo ! es para recibir un archivo desde el cliente
                 if (dataFromClient.Contains("!"))
                 {
                     var ArrNombreArchivo = dataFromClient.Split('!');
-                    string NombreArchivo = ArrNombreArchivo[0];
-                    fileName = Path.Combine(Path.GetDirectoryName(fileName), NombreArchivo + "count.xml");
+                    string IdDispositivo = ArrNombreArchivo[0];
+                    fileName = Path.Combine(Path.GetDirectoryName(fileName), IdDispositivo + "_count.xml");
 
                     var Response = Encoding.ASCII.GetBytes("Continuar");
                     networkStream.Write(Response, 0, Response.Length);
@@ -71,12 +68,9 @@ namespace ServerFiles
                     try
                     {
                         MemoryStream memoryStream = new MemoryStream();
-                        byte[] inStream = new byte[4096*8];
-                        //do
-                        //{
+                        byte[] inStream = new byte[4096 * 8];
                         bytesRead = networkStream.Read(inStream, 0, inStream.Length);
                         memoryStream.Write(inStream, 0, bytesRead);
-                        //} while (bytesRead > 0);
 
                         if (!Directory.Exists(Path.GetDirectoryName(fileName)))
                             Directory.CreateDirectory(Path.GetDirectoryName(fileName));
@@ -89,7 +83,7 @@ namespace ServerFiles
                         ArchivoRecibido.Close();
                         Console.WriteLine(" >> Recibido Correctamente");
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.WriteLine(ex.Message);
                     }
@@ -103,29 +97,34 @@ namespace ServerFiles
                     StreamReader streamReader = new StreamReader(fileName);
                     var memoryStream = new MemoryStream();
                     streamReader.BaseStream.CopyTo(memoryStream);
-                    sendBytes = memoryStream.ToArray();
+                    byte[] sendBytes = memoryStream.ToArray();
                     memoryStream.Close();
                     streamReader.Close();
 
                     //sendBytes =  Encoding.ASCII.GetBytes(serverResponse);
                     networkStream.Write(sendBytes, 0, sendBytes.Length);
                     networkStream.Flush();
-                    Console.WriteLine(" >> " + serverResponse);
                 }
             }
-            catch(ObjectDisposedException)
+            catch (ObjectDisposedException)
             {
-                Console.WriteLine("El NetworkStream del client esta vacío.");
+                LevantaExcepcion(new Exception("Stream null."));
             }
             catch (Exception ex)
             {
-                Console.WriteLine(" >> " + ex.ToString());
+                LevantaExcepcion(ex);
             }
             finally
             {
                 clientSocket.Close();
             }// try - finally
         } // DoAction
+
+
+        private void LevantaExcepcion(Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
         #endregion
     }
 }
