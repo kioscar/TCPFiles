@@ -5,7 +5,6 @@ using System.Text;
 // using utilizados para Sockets
 using System.Net;
 using System.Net.Sockets;
-
 //Multi-Thread
 using System.Threading;
 namespace ServerFiles
@@ -13,8 +12,10 @@ namespace ServerFiles
     public class ServerFile
     {
         #region Variables
-        TcpListener serverSocket;
-        TcpClient clientSocket;
+        private TcpListener serverSocket;
+        private TcpClient clientSocket;
+
+        public IServerFile subject;
         #endregion
 
         #region Propiedades
@@ -91,9 +92,10 @@ namespace ServerFiles
         {
             try
             {
-                clientSocket = default(TcpClient);
+                clientSocket = default;
                 clientSocket = serverSocket.EndAcceptTcpClient(ar);
                 HandlerClient hndlCliente = new HandlerClient();
+                hndlCliente.subject = this.subject;
                 hndlCliente.StartClient(clientSocket, RutaArchivo);
 
                 // Lo dejamos escuchando para nuevas conexiones.

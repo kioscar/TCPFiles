@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-
 using ServerFiles;
+
 namespace Ejemplo1
 {
-    public partial class MainFrm : Form
+    public partial class MainFrm : Form, IServerFile
     {
         ServerFile server;
         const string rutaArchivo = @"C:\Archivos\archivo.xml";
@@ -27,6 +27,7 @@ namespace Ejemplo1
             try
             {
                 server = new ServerFile(txtServer.Text, Convert.ToInt32(txtPort.Text), rutaArchivo);
+                server.subject = this;
                 server.Start();
                 /*Thread ServidorThread = new Thread(DoSomething);
                 ServidorThread.Start();*/
@@ -38,13 +39,18 @@ namespace Ejemplo1
 
         }
 
-        private void DoSomething()
-        {
-           
-        }
-
         private void MainFrm_Leave(object sender, EventArgs e)
         {
+        }
+
+        public void DoAction(string accion)
+        {
+            txtMensajes.Text += "Archivo "+ accion+ " correctamente.\n\r";
+        }
+
+        public void MuestraError(string error)
+        {
+            txtMensajes.Text += error + "\n";
         }
     }
 }

@@ -28,6 +28,29 @@ namespace Cliente1
             // Enviar el archivo al servidor 
             var btnEnviar = FindViewById<Button>(Resource.Id.btnEnviar);
             btnEnviar.Click += BtnEnviar_Click;
+
+            var btnProbar = FindViewById<Button>(Resource.Id.btnProbar);
+            btnProbar.Click += BtnProbar_Click;
+        }
+
+        private void BtnProbar_Click(object sender, EventArgs e)
+        {
+            var txtServidor = FindViewById<TextView>(Resource.Id.edtServidor);
+            var txtPort = FindViewById<TextView>(Resource.Id.edtPuerto);
+
+            try
+            {
+
+                ClientFile clienteTcp = new ClientFile(aPort: int.Parse(txtPort.Text), aServer: txtServidor.Text);
+                clienteTcp.Context = this;
+                clienteTcp.Conectar();
+                Toast.MakeText(this, "Conectado.", ToastLength.Short).Show();
+            }
+            catch (Exception ex)
+            {
+                var edtMensaje = FindViewById<EditText>(Resource.Id.edtMensaje);
+                edtMensaje.Text += ex.Message + "\n";
+            }
         }
 
         private void BtnEnviar_Click(object sender, EventArgs e)
@@ -70,13 +93,14 @@ namespace Cliente1
 
             Toast.MakeText(this, "IP: " + txtServidor.Text + ", Puerto: " + 
                 txtPort.Text, ToastLength.Long).Show();
-            
+
             try
             {
                 var rutaArchivo = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "XMLS");
+                Directory.CreateDirectory(rutaArchivo);
                 rutaArchivo = Path.Combine(rutaArchivo, "archivo.xml");
 
-                ClientFile clienteTcp = new ClientFile(aPort: int.Parse(txtPort.Text), aServer: "192.168.0.29", aFileName: rutaArchivo);
+                ClientFile clienteTcp = new ClientFile(aPort: int.Parse(txtPort.Text), aServer: txtServidor.Text, aFileName: rutaArchivo);
                 clienteTcp.Conectar();
                 var edtMensaje = FindViewById<EditText>(Resource.Id.edtMensaje);
                 edtMensaje.Text += clienteTcp.EnviarMensajeRecibirArchivo() + "\n";

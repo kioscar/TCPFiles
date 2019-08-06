@@ -15,8 +15,10 @@ namespace ServerFiles
 
 
         #region Variables
-        TcpClient clientSocket;
-        string fileName;
+        private TcpClient clientSocket;
+        private string fileName;
+
+        public IServerFile subject;
 
         #endregion
 
@@ -81,7 +83,7 @@ namespace ServerFiles
                         memoryStream.Seek(0, SeekOrigin.Begin);
                         memoryStream.CopyTo(ArchivoRecibido);
                         ArchivoRecibido.Close();
-                        Console.WriteLine(" >> Recibido Correctamente");
+                        subject.DoAction("recibido");
                     }
                     catch (Exception ex)
                     {
@@ -90,8 +92,6 @@ namespace ServerFiles
                 }
                 else
                 {
-
-                    Console.WriteLine(" >> " + dataFromClient);
 
                     // Cargamos el archivo para enviarlo 
                     StreamReader streamReader = new StreamReader(fileName);
@@ -104,6 +104,8 @@ namespace ServerFiles
                     //sendBytes =  Encoding.ASCII.GetBytes(serverResponse);
                     networkStream.Write(sendBytes, 0, sendBytes.Length);
                     networkStream.Flush();
+
+                    subject.DoAction("enviado");
                 }
             }
             catch (ObjectDisposedException)
@@ -123,7 +125,7 @@ namespace ServerFiles
 
         private void LevantaExcepcion(Exception ex)
         {
-            throw new Exception(ex.Message);
+            subject.MuestraError(ex.Message);
         }
         #endregion
     }
