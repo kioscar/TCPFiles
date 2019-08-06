@@ -57,7 +57,7 @@
 		</EditText>
         
 		<Button
-			android:text="@android:string/search_go"
+			android:text="@string/ButtonTest"
 			android:minWidth="25px"
 			android:minHeight="25px"
 			android:layout_width="match_parent"
